@@ -1,3 +1,31 @@
-from django.db import models # noqa
+"""
+Data base mdoel.
+"""
+from django.db import models
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager
+)
 
-# Create your models here.
+
+class UserManager(BaseUserManager):
+    """USER MANGER MODEL"""
+
+    def create_user(self, email, passwords=None, **extra_field):
+        user = self.model(email=email, **extra_field)
+        user.set_password(passwords)
+        user.save(using=self._db)
+        return user
+
+
+class User(PermissionsMixin, AbstractBaseUser):
+    """class User"""
+
+    email = models.EmailField(max_length=255, unique=True)
+    name = models.CharField(max_length=255)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
